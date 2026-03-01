@@ -33,7 +33,7 @@ function carregarDados() {
 // ─── BÍBLIA ───────────────────────────────────────
 async function carregarBiblia() {
   try {
-    const r = await fetch('./data/referencias.json');
+    const r = await fetch('https://cdn.jsdelivr.net/gh/binhoccbs98-svg/STUDY-BIBLE@main/data/referencias.json');
     if (!r.ok) throw new Error(`HTTP ${r.status}`);
     S.dados = await r.json();
     S.biblia = S.dados.biblia || {};

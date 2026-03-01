@@ -454,7 +454,7 @@ try{HISTORICO=JSON.parse(sessionStorage.getItem('sermao_hist')||'[]');}catch{HIS
 document.getElementById('nota-titulo-g').addEventListener('input',notasAutoSalvar);
 document.getElementById('nota-editor-g').addEventListener('input',()=>{notasContador();notasAutoSalvar();});
 
-fetch('./data/referencias.json')
+fetch('https://cdn.jsdelivr.net/gh/binhoccbs98-svg/STUDY-BIBLE@main/data/referencias.json')
   .then(r=>r.json())
   .then(dados=>{
     BIBLIA=dados.biblia||{};REFS=dados.referencias||{};
