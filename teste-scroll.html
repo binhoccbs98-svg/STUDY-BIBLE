@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Teste Scroll</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { height: 100%; overflow: hidden; background: #0c1016; color: #dde4ee; font-family: sans-serif; }
+
+    .topo {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      background: #131921;
+      border-bottom: 1px solid #253347;
+      padding: 12px;
+      z-index: 10;
+    }
+
+    .conteudo {
+      position: fixed;
+      top: 90px; /* altura do topo */
+      left: 0; right: 0; bottom: 0;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      padding: 16px;
+    }
+
+    .item {
+      background: #1a2332;
+      border: 1px solid #253347;
+      border-radius: 8px;
+      padding: 16px;
+      margin-bottom: 10px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="topo">
+    <p style="color:#c9a84c;font-size:.9rem">✝ Teste de Scroll Mobile</p>
+  </div>
+
+  <div class="conteudo" id="conteudo">
+    <div class="item"><strong>Versículo 1</strong><p>No princípio criou Deus os céus e a terra.</p></div>
+    <div class="item"><strong>Versículo 2</strong><p>E a terra era sem forma e vazia.</p></div>
+    <div class="item"><strong>Versículo 3</strong><p>E disse Deus: Haja luz; e houve luz.</p></div>
+    <div class="item"><strong>Versículo 4</strong><p>E viu Deus que a luz era boa.</p></div>
+    <div class="item"><strong>Versículo 5</strong><p>E Deus chamou à luz Dia.</p></div>
+    <div class="item"><strong>Versículo 6</strong><p>E disse Deus: Haja uma expansão no meio das águas.</p></div>
+    <div class="item"><strong>Versículo 7</strong><p>E fez Deus a expansão.</p></div>
+    <div class="item"><strong>Versículo 8</strong><p>E chamou Deus à expansão Céus.</p></div>
+    <div class="item"><strong>Versículo 9</strong><p>E disse Deus: Ajuntem-se as águas debaixo dos céus.</p></div>
+    <div class="item"><strong>Versículo 10</strong><p>E chamou Deus ao seco Terra.</p></div>
+    <div class="item"><strong>Versículo 11</strong><p>E disse Deus: Produza a terra erva.</p></div>
+    <div class="item"><strong>Versículo 12</strong><p>E a terra produziu erva.</p></div>
+    <div class="item"><strong>Versículo 13</strong><p>E foi a tarde e a manhã, o dia terceiro.</p></div>
+    <div class="item"><strong>Versículo 14</strong><p>E disse Deus: Haja luminares na expansão dos céus.</p></div>
+    <div class="item"><strong>Versículo 15</strong><p>E sejam para luminares na expansão dos céus.</p></div>
+    <div class="item"><strong>Versículo 16</strong><p>E fez Deus os dois grandes luminares.</p></div>
+    <div class="item"><strong>Versículo 17</strong><p>E os pôs Deus na expansão dos céus.</p></div>
+    <div class="item"><strong>Versículo 18</strong><p>E para governar o dia e a noite.</p></div>
+    <div class="item"><strong>Versículo 19</strong><p>E foi a tarde e a manhã, o dia quarto.</p></div>
+    <div class="item"><strong>Versículo 20</strong><p>E disse Deus: Produzam as águas répteis.</p></div>
+  </div>
+
+</body>
+</html>

@@ -97,6 +97,16 @@ function destacar(texto,termo,exata){
 // ─── SISTEMA DE ABAS ──────────────────────────────
 let _id=0;
 function abrirAba(params){
+  // Mobile: redireciona para resultado.html
+  if(window.innerWidth <= 768){
+    const p = new URLSearchParams();
+    if(params.tipo === "capitulo"){ p.set("tipo","capitulo"); p.set("livro",params.livro||""); p.set("cap",params.cap||1); }
+    else if(params.tipo === "versiculo"){ p.set("tipo","versiculo"); p.set("ref",params.ref||""); }
+    else if(params.tipo === "palavra"){ p.set("tipo","palavra"); p.set("termo",params.termo||""); p.set("exata",params.exata?"1":"0"); }
+    else if(params.livro && params.cap){ p.set("tipo","capitulo"); p.set("livro",params.livro); p.set("cap",params.cap); }
+    else if(params.ref){ p.set("tipo","versiculo"); p.set("ref",params.ref); }
+    if(p.has("tipo")) { location.href = "./resultado.html?" + p.toString(); return; }
+  }
   const label=params.label||params.ref||`${params.livro} ${params.cap}`;
   const existe=S.abas.find(a=>a.label===label);
   if(existe){ativarAba(existe.id);return;}
@@ -145,7 +155,6 @@ function renderAbas(){
   lista.innerHTML=S.abas.map(a=>`<div class="aba ${a.id===S.abaAtiva?'ativa':''}" onclick="ativarAba(${a.id})"><span class="aba-ic">${a.icone}</span><span class="aba-txt" title="${esc(a.label)}">${esc(a.label)}</span><button class="aba-x" onclick="event.stopPropagation();fecharAba(${a.id})">✕</button></div>`).join('');
 }
 
-// Aplica destaques/marcadores/anotações em versos do container
 function aplicarEstilos(container){
   container?.querySelectorAll('.verso[data-ref]').forEach(el=>{
     const ref=el.dataset.ref;
@@ -176,7 +185,7 @@ function htmlCapitulo({livro,cap}){
   const linhas=versos.map(v=>{
     const temRef=!!refsMap[v.ref];
     const onclick=temRef?`onclick="abrirVersiculo('${v.ref.replace(/'/g,"\\'")}') "`:'';
-    return `<div class="verso link" data-ref="${esc(v.ref)}" ${onclick}><span class="verso-n">${v.n}</span><span class="verso-t">${esc(v.txt)}</span><div class="verso-acoes"><button class="verso-ac-btn" onclick="event.stopPropagation();toggleFav('${v.ref.replace(/'/g,"\\'")}')" title="Favorito">⭐</button><button class="verso-ac-btn" onclick="event.stopPropagation();abrirPopup('${v.ref.replace(/'/g,"\\'")}') " title="Anotar/Destacar">✏️</button></div></div>`;
+    return `<div class="verso link" data-ref="${esc(v.ref)}" ${onclick}><span class="verso-n">${v.n}</span><span class="verso-t">${esc(v.txt)}</span><div class="verso-acoes"><button class="verso-ac-btn" onclick="event.stopPropagation();toggleFav('${v.ref.replace(/'/g,"\\'")}') " title="Favorito">⭐</button><button class="verso-ac-btn" onclick="event.stopPropagation();abrirPopup('${v.ref.replace(/'/g,"\\'")}') " title="Anotar/Destacar">✏️</button></div></div>`;
   }).join('');
   return{icone:'📖',html:`<div class="capitulo-wrap"><div class="card"><div class="card-topo"><span class="tag-label">✦ Capítulo Completo</span><h2 class="card-ref">${esc(titulo)}</h2><p class="card-meta">${versos.length} versículos · ${comRefs} com refs · ⭐ favoritar · ✏️ anotar/destacar</p></div><div class="cap-versos">${linhas}</div><div class="card-acoes"><button class="btn-ac" onclick="copiarCapitulo('${esc(titulo)}')">📋 Copiar</button><button class="btn-ac" onclick="exportarCapitulo('${esc(titulo)}')">📄 Exportar</button></div></div></div>`};
 }
@@ -278,23 +287,18 @@ function fecharPopup(){document.getElementById('popup-overlay').classList.add('h
 function salvarPopup(){
   if(!_popupRef) return;
   const ref=_popupRef;
-  // Anotação
   const anot=document.getElementById('popup-anotacao').value.trim();
   if(anot) S.anotacoes[ref]=anot; else delete S.anotacoes[ref];
-  // Destaque
   const dBtn=document.querySelector('#popup-cores .cor-btn.selecionada');
   const dCor=dBtn?dBtn.dataset.cor:'';
   if(dCor) S.destaques[ref]=dCor; else delete S.destaques[ref];
-  // Marcador
   const mBtn=document.querySelector('.cor-marcador.selecionada');
   const mCor=mBtn?mBtn.dataset.cor:'';
   if(mCor) S.marcadores[ref]=mCor; else delete S.marcadores[ref];
-  // Tema
   const tema=document.getElementById('popup-tema-sel').value;
   if(tema&&S.temas[tema]&&!S.temas[tema].includes(ref)) S.temas[tema].push(ref);
   salvarDados();
   reaplicarTudo();
-  // Atualiza anotação inline
   document.querySelectorAll(`.verso-anotacao[data-anotRef="${CSS.escape(ref)}"]`).forEach(el=>el.remove());
   if(anot){
     document.querySelectorAll(`.verso[data-ref="${CSS.escape(ref)}"]`).forEach(el=>{
@@ -348,26 +352,38 @@ function recarregarEspecial(label,subtipo){
 
 // ─── AÇÕES GLOBAIS ────────────────────────────────
 function buscarTexto(texto){
-  const inp=document.getElementById('input-referencia');if(inp) inp.value=texto;
+  const inp=document.getElementById('input-referencia');
+  if(inp) inp.value=texto;
   realizarBusca(texto);
 }
+
+// BUSCA UNIFICADA — detecta automaticamente referência ou palavra
 function realizarBusca(t){
   if(!S.carregado) return;
   const inp=document.getElementById('input-referencia');
-  const texto=t??inp?.value?.trim();
-  if(!texto){inp&&(inp.style.boxShadow='0 0 0 2px var(--erro)');setTimeout(()=>inp&&(inp.style.boxShadow=''),1500);return;}
-  const a=analisar(texto);if(!a) return;
-  abrirAba({...a,label:a.ref||`${a.livro} ${a.cap}`});
+  const texto=(t??inp?.value?.trim());
+  if(!texto){
+    inp&&(inp.style.boxShadow='0 0 0 2px var(--erro)');
+    setTimeout(()=>inp&&(inp.style.boxShadow=''),1500);
+    return;
+  }
+  // Tenta como referência bíblica primeiro
+  const a=analisar(texto);
+  if(a && a.livro && capVersos(a.livro, a.cap).length > 0){
+    abrirAba({...a, label: a.ref || `${a.livro} ${a.cap}`});
+    return;
+  }
+  // Se não achou → busca por palavras automaticamente
+  const cbMobile = document.getElementById('mobile-frase-exata');
+  const cbDesktop = document.getElementById('filtro-exata');
+  const fraseExata = (cbMobile?.checked || cbDesktop?.checked) || (texto.startsWith('"') && texto.endsWith('"'));
+  const termo = (texto.startsWith('"') && texto.endsWith('"')) ? texto.slice(1,-1) : texto;
+  abrirAba({tipo:'palavra', termo, exata: fraseExata, filtroLivro:'', label:`"${termo}"`});
 }
-function realizarBuscaPalavra(){
-  if(!S.carregado) return;
-  const termo=document.getElementById('input-palavra')?.value?.trim(); if(!termo) return;
-  const exata=document.getElementById('filtro-exata')?.checked||false;
-  const filtro=document.getElementById('filtro-livro')?.value||'';
-  abrirAba({tipo:'palavra',termo,exata,filtroLivro:filtro,label:`"${termo}"${filtro?` · ${filtro}`:''}`});
-}
+
 function abrirVersiculo(ref){ abrirAba({tipo:'versiculo',ref,label:ref}); }
 function abrirCapitulo(livro,cap){ abrirAba({tipo:'capitulo',livro,cap:+cap,label:`${livro} ${cap}`}); }
+
 function abrirView(subtipo){
   const labels={favoritos:'⭐ Favoritos',marcadores:'🔖 Marcadores',tematicos:'📚 Temáticos'};
   const icones={favoritos:'⭐',marcadores:'🔖',tematicos:'📚'};
@@ -413,7 +429,23 @@ function notasExcluir(id){S.notas=S.notas.filter(n=>n.id!==id);notasSalvar();if(
 function notasExportar(){const n=S.notas.find(x=>x.id===S.notaAtiva);if(!n)return;const t=n.titulo||'Nota';_download(`${t.replace(/[^\wÀ-ú\s]/g,'').replace(/\s+/g,'-')||'nota'}.txt`,`${t}\n${n.data}\n${'='.repeat(50)}\n\n${n.corpo}\n\n${'='.repeat(50)}\nGerador de Sermão v2.5`);}
 function notasContador(){const e=document.getElementById('nota-editor'),c=document.getElementById('nota-palavras');if(!e||!c)return;const n=e.value.trim().split(/\s+/).filter(Boolean).length;c.textContent=`${n} palavra${n!==1?'s':''}`;}
 function notasRenderTabs(){const el=document.getElementById('notas-tabs');if(!el)return;el.innerHTML=S.notas.map(n=>`<div class="nota-tab ${n.id===S.notaAtiva?'ativa':''}" onclick="notasAtivar('${n.id}')"><span title="${esc(n.titulo||'Sem título')}">${esc((n.titulo||'Sem título').substring(0,13))}</span><button class="nota-tab-x" onclick="event.stopPropagation();notasExcluir('${n.id}')">✕</button></div>`).join('');}
-function toggleNotas(){S.notasAbertas=!S.notasAbertas;const p=document.getElementById('notas-painel'),dv=document.getElementById('notas-divisor'),b=document.getElementById('btn-reabrir-notas');if(S.notasAbertas){p?.classList.remove('minimizado');dv?.classList.remove('minimizado');b?.classList.add('hidden');}else{p?.classList.add('minimizado');dv?.classList.add('minimizado');b?.classList.remove('hidden');}}
+
+// ─── TOGGLE NOTAS ─────────────────────────────────
+function toggleNotas(){
+  S.notasAbertas = !S.notasAbertas;
+  const p  = document.getElementById('notas-painel');
+  const dv = document.getElementById('notas-divisor');
+  const b  = document.getElementById('btn-reabrir-notas');
+  if(S.notasAbertas){
+    p?.classList.remove('minimizado');
+    dv?.classList.remove('minimizado');
+    b?.classList.add('hidden');
+  } else {
+    p?.classList.add('minimizado');
+    dv?.classList.add('minimizado');
+    b?.classList.remove('hidden');
+  }
+}
 
 // ─── REDIMENSIONAMENTO ────────────────────────────
 function iniciarRedim(){
@@ -440,15 +472,12 @@ document.addEventListener('DOMContentLoaded',async()=>{
   const ok=await carregarBiblia();
   if(!ok){document.getElementById('abas-content').innerHTML=`<div class="estado-vazio"><span class="estado-vazio-ic">⚠️</span><h3>Erro ao carregar dados</h3><p>Use: <code>npx serve</code></p></div>`;}
 
-  // Busca
+  // Busca unificada
   document.getElementById('btn-buscar')?.addEventListener('click',()=>realizarBusca());
   document.getElementById('input-referencia')?.addEventListener('keydown',e=>{if(e.key==='Enter')realizarBusca();});
-  document.getElementById('btn-buscar-palavra')?.addEventListener('click',realizarBuscaPalavra);
-  document.getElementById('input-palavra')?.addEventListener('keydown',e=>{if(e.key==='Enter')realizarBuscaPalavra();});
 
-  // Sugestões + modo + nav
+  // Sugestões + nav
   document.querySelectorAll('.sugestao-btn').forEach(b=>b.addEventListener('click',()=>buscarTexto(b.dataset.ref)));
-  document.querySelectorAll('.modo-tab').forEach(b=>b.addEventListener('click',()=>setModo(b.dataset.modo)));
   document.querySelectorAll('.nav-btn').forEach(b=>b.addEventListener('click',()=>abrirView(b.dataset.view)));
 
   // Notas
@@ -493,16 +522,48 @@ document.addEventListener('DOMContentLoaded',async()=>{
     btn.classList.toggle('ativo',!!S.favoritos[_popupRef]);
   });
 
-  // Modo
-  function setModo(modo){
-    S.modo=modo;
-    document.querySelectorAll('.modo-tab').forEach(b=>b.classList.toggle('active',b.dataset.modo===modo));
-    document.getElementById('busca-ref-area')?.classList.toggle('hidden',modo!=='referencia');
-    document.getElementById('busca-palavra-area')?.classList.toggle('hidden',modo!=='palavra');
-    document.getElementById('secao-sugestoes')?.classList.toggle('hidden',modo!=='referencia');
-    setTimeout(()=>document.getElementById(modo==='referencia'?'input-referencia':'input-palavra')?.focus(),40);
+  iniciarRedim();
+
+  // ── MOBILE: inicia com notas fechadas + checkbox frase exata ──
+  if(window.innerWidth <= 768){
+    S.notasAbertas = true;
+    toggleNotas();
+
+    // Injeta checkbox "frase exata" abaixo do campo de busca
+    const buscaArea = document.getElementById('busca-ref-area');
+    if(buscaArea && !document.getElementById('mobile-frase-exata-area')){
+      const div = document.createElement('div');
+      div.id = 'mobile-frase-exata-area';
+      div.innerHTML = '<input type="checkbox" id="mobile-frase-exata"/> <label for="mobile-frase-exata">Frase exata</label>';
+      buscaArea.after(div);
+    }
+
+    // Força scroll no abas-content via JS (sobrescreve qualquer CSS)
+    function fixScrollMobile(){
+      const ac = document.getElementById('abas-content');
+      if(!ac) return;
+      ac.style.cssText = 'flex:1;min-height:0;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;position:static;height:auto;';
+    }
+    fixScrollMobile();
+
+    // Reaplica sempre que uma nova aba for aberta (o JS do app pode resetar estilos)
+    const _abrirAbaOrig = abrirAba;
+    window.abrirAba = function(...args){
+      _abrirAbaOrig(...args);
+      setTimeout(fixScrollMobile, 50);
+    };
+
+    // Garante que painel-aba ativo não tenha height fixo
+    function fixPainelMobile(){
+      document.querySelectorAll('.painel-aba').forEach(p => {
+        p.style.height = 'auto';
+        p.style.overflow = 'visible';
+        p.style.position = 'static';
+      });
+    }
+    const observer = new MutationObserver(()=>{ fixScrollMobile(); fixPainelMobile(); });
+    observer.observe(document.getElementById('abas-content'), { childList: true, subtree: true });
   }
 
-  iniciarRedim();
   console.log('✅ Pronto!');
 });

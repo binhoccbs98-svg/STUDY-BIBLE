@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Sermão Mobile</title>
+  <style>
+    :root {
+      --fundo:#0c1016; --fundo-2:#131921; --fundo-3:#1a2332;
+      --borda:#253347; --ouro:#c9a84c; --ouro-cl:#e8c97a; --ouro-esc:#7a5c20;
+      --texto:#dde4ee; --texto-s:#8fa3bc; --texto-f:#3d5066;
+      --mark:rgba(201,168,76,.28);
+    }
+    *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+    html,body{height:100%;background:var(--fundo);color:var(--texto);font-family:'Georgia',serif;}
+
+    /* TOPO */
+    .topo{position:fixed;top:0;left:0;right:0;z-index:100;background:var(--fundo-2);border-bottom:2px solid var(--ouro-esc);display:flex;align-items:center;gap:8px;padding:8px 10px;}
+    .btn-voltar{background:var(--fundo-3);border:1px solid var(--borda);border-radius:8px;color:var(--ouro);padding:6px 12px;font-size:.82rem;cursor:pointer;text-decoration:none;white-space:nowrap;flex-shrink:0;}
+    .topo-titulo{font-size:.85rem;color:var(--ouro-cl);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1;}
+    .btn-notas-topo{background:linear-gradient(135deg,var(--ouro),#a07830);border:none;border-radius:8px;color:#1a0f00;padding:6px 10px;font-size:.78rem;font-weight:700;cursor:pointer;white-space:nowrap;flex-shrink:0;}
+
+    /* ABAS HISTÓRICO */
+    .historico-bar{position:fixed;top:48px;left:0;right:0;z-index:99;background:var(--fundo-2);border-bottom:1px solid var(--borda);display:flex;overflow-x:auto;gap:4px;padding:5px 8px;scrollbar-width:none;}
+    .historico-bar::-webkit-scrollbar{display:none;}
+    .hist-aba{background:var(--fundo-3);border:1px solid var(--borda);border-radius:6px;color:var(--texto-s);padding:4px 10px;font-size:.72rem;cursor:pointer;white-space:nowrap;flex-shrink:0;}
+    .hist-aba.ativa{background:rgba(201,168,76,.12);border-color:var(--ouro-esc);color:var(--ouro-cl);}
+
+    /* CONTEÚDO */
+    .conteudo{padding:106px 12px 80px;}
+
+    /* CARDS */
+    .card{background:var(--fundo-2);border:1px solid var(--borda);border-radius:12px;margin-bottom:12px;overflow:hidden;position:relative;}
+    .card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--ouro),transparent);}
+    .cap-header{padding:14px 14px 10px;}
+    .cap-titulo{font-size:1.1rem;color:var(--ouro-cl);margin-bottom:3px;}
+    .cap-meta{font-size:.7rem;color:var(--texto-f);}
+
+    /* VERSÍCULOS */
+    .verso-item{display:flex;gap:10px;padding:9px 14px;border-bottom:1px solid rgba(255,255,255,.03);align-items:flex-start;}
+    .verso-num{font-size:.65rem;color:var(--ouro-esc);font-weight:bold;min-width:18px;padding-top:4px;text-align:right;flex-shrink:0;}
+    .verso-body{flex:1;}
+    .verso-text{font-size:.95rem;line-height:1.75;color:var(--texto);}
+    .verso-btns{display:flex;flex-wrap:wrap;gap:4px;margin-top:6px;}
+    .vbtn{background:rgba(255,255,255,.05);border:1px solid var(--borda);border-radius:6px;color:var(--texto-s);padding:4px 8px;font-size:.72rem;cursor:pointer;}
+    .vbtn.ativo{background:rgba(201,168,76,.15);border-color:var(--ouro-esc);color:var(--ouro);}
+    .anotacao-verso{font-size:.78rem;color:var(--texto-s);font-style:italic;background:rgba(201,168,76,.07);border-left:2px solid var(--ouro-esc);padding:4px 8px;border-radius:0 4px 4px 0;margin-top:4px;}
+
+    /* REFS CRUZADAS */
+    .verso-ref-card{padding:12px 14px 4px;font-size:.7rem;color:var(--ouro);letter-spacing:.1em;text-transform:uppercase;}
+    .verso-txt-card{font-size:1rem;line-height:1.8;color:var(--texto);font-style:italic;border-left:3px solid var(--ouro-esc);margin:0 14px 12px;padding:4px 10px;}
+    .card-acoes{display:flex;gap:8px;padding:8px 14px 12px;border-top:1px solid var(--borda);flex-wrap:wrap;}
+    .btn-acao{background:var(--fundo-3);border:1px solid var(--borda);border-radius:6px;color:var(--texto-s);padding:5px 10px;font-size:.75rem;cursor:pointer;}
+    .btn-acao.ativo{background:rgba(201,168,76,.15);border-color:var(--ouro-esc);color:var(--ouro);}
+    .ref-item{display:flex;gap:10px;background:var(--fundo-3);border:1px solid var(--borda);border-radius:8px;padding:10px 12px;margin-bottom:8px;align-items:flex-start;cursor:pointer;}
+    .ref-num{width:20px;height:20px;background:rgba(201,168,76,.1);border:1px solid rgba(201,168,76,.2);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.58rem;color:var(--ouro);flex-shrink:0;}
+    .ref-body{flex:1;}
+    .ref-ref{font-size:.85rem;color:var(--ouro-cl);margin-bottom:4px;}
+    .ref-txt{font-size:.82rem;color:var(--texto-s);font-style:italic;line-height:1.5;}
+    .ref-votos{font-size:.65rem;color:var(--texto-f);margin-top:3px;}
+    .ref-votos.hi{color:var(--ouro);}
+
+    /* PALAVRAS */
+    .palavra-item{background:var(--fundo-3);border:1px solid var(--borda);border-radius:8px;padding:10px 12px;margin-bottom:8px;cursor:pointer;}
+    .palavra-ref-txt{font-size:.82rem;color:var(--ouro-cl);margin-bottom:4px;}
+    .palavra-trecho{font-size:.85rem;color:var(--texto-s);font-style:italic;line-height:1.5;}
+    .palavra-trecho mark{background:var(--mark);color:var(--ouro-cl);border-radius:2px;font-style:normal;}
+
+    /* SEÇÃO */
+    .secao-titulo{font-size:.65rem;letter-spacing:.12em;text-transform:uppercase;color:var(--ouro);margin:16px 0 8px;display:flex;align-items:center;gap:8px;}
+    .secao-titulo::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,var(--borda),transparent);}
+
+    /* NOTAS GAVETA */
+    .notas-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:200;}
+    .notas-overlay.aberto{display:block;}
+    .notas-gaveta{position:fixed;bottom:0;left:0;right:0;z-index:201;background:var(--fundo-2);border-top:2px solid var(--ouro-esc);border-radius:16px 16px 0 0;height:78vh;display:flex;flex-direction:column;transform:translateY(100%);transition:transform .3s cubic-bezier(.4,0,.2,1);}
+    .notas-gaveta.aberto{transform:translateY(0);}
+    .notas-handle{display:flex;justify-content:space-between;align-items:center;padding:12px 16px 8px;border-bottom:1px solid var(--borda);flex-shrink:0;}
+    .notas-handle-titulo{color:var(--ouro);font-size:.85rem;font-weight:600;}
+    .notas-handle-btns{display:flex;gap:6px;}
+    .nh-btn{background:var(--fundo-3);border:1px solid var(--borda);border-radius:6px;color:var(--texto-s);padding:4px 10px;font-size:.78rem;cursor:pointer;}
+    .notas-tabs-bar{display:flex;overflow-x:auto;gap:4px;padding:6px 10px;border-bottom:1px solid var(--borda);flex-shrink:0;scrollbar-width:none;}
+    .notas-tabs-bar::-webkit-scrollbar{display:none;}
+    .ntab{background:var(--fundo-3);border:1px solid var(--borda);border-radius:6px;color:var(--texto-s);padding:4px 10px;font-size:.72rem;cursor:pointer;white-space:nowrap;display:flex;align-items:center;gap:5px;flex-shrink:0;}
+    .ntab.ativa{background:rgba(201,168,76,.12);border-color:var(--ouro-esc);color:var(--ouro-cl);}
+    .ntab-x{background:none;border:none;color:var(--texto-f);cursor:pointer;font-size:.7rem;padding:0 2px;}
+    .notas-corpo-g{flex:1;display:flex;flex-direction:column;overflow:hidden;padding:10px;}
+    .nota-titulo-inp{background:transparent;border:none;border-bottom:1px solid var(--borda);color:var(--ouro-cl);font-size:.95rem;padding:6px 2px;margin-bottom:8px;width:100%;outline:none;font-family:'Georgia',serif;}
+    .nota-editor-g{flex:1;background:transparent;border:none;color:var(--texto);font-size:.88rem;line-height:1.7;resize:none;outline:none;font-family:'Georgia',serif;overflow-y:auto;-webkit-overflow-scrolling:touch;}
+    .nota-footer-g{display:flex;justify-content:space-between;align-items:center;padding:6px 2px;font-size:.68rem;color:var(--texto-f);flex-shrink:0;border-top:1px solid var(--borda);margin-top:6px;}
+
+    /* POPUP VERSÍCULO */
+    .popup-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:300;align-items:flex-end;justify-content:center;}
+    .popup-overlay.aberto{display:flex;}
+    .popup-card-m{background:var(--fundo-2);border-top:2px solid var(--ouro-esc);border-radius:16px 16px 0 0;width:100%;max-height:88vh;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:16px;}
+    .popup-header-m{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;}
+    .popup-ref-m{color:var(--ouro-cl);font-size:.9rem;font-weight:600;}
+    .popup-fechar-m{background:var(--fundo-3);border:1px solid var(--borda);border-radius:6px;color:var(--texto-s);width:28px;height:28px;cursor:pointer;font-size:.8rem;}
+    .popup-verso-txt{font-style:italic;color:var(--texto-s);font-size:.88rem;line-height:1.6;margin-bottom:14px;}
+    .popup-secao-m{margin-bottom:14px;}
+    .popup-label-m{font-size:.68rem;letter-spacing:.1em;text-transform:uppercase;color:var(--texto-f);margin-bottom:6px;}
+    .popup-cores-m{display:flex;gap:6px;flex-wrap:wrap;}
+    .cor-btn-m{width:30px;height:30px;border-radius:50%;border:2px solid var(--borda);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:.75rem;background:var(--fundo-3);color:var(--texto-s);}
+    .cor-btn-m.selecionada{border-color:white;transform:scale(1.15);}
+    .popup-textarea-m{width:100%;background:var(--fundo-3);border:1px solid var(--borda);border-radius:8px;color:var(--texto);font-size:.85rem;padding:10px;line-height:1.6;resize:none;height:80px;outline:none;font-family:'Georgia',serif;}
+    .popup-marcadores-m{display:flex;gap:6px;}
+    .marcador-btn-m{width:30px;height:30px;border-radius:50%;border:2px solid var(--borda);cursor:pointer;background:var(--fundo-3);display:flex;align-items:center;justify-content:center;font-size:.7rem;color:var(--texto-s);}
+    .marcador-btn-m.selecionado{border-color:white;transform:scale(1.15);}
+    .popup-row-m{display:flex;gap:8px;align-items:center;flex-wrap:wrap;}
+    .fav-btn-m{background:var(--fundo-3);border:1px solid var(--borda);border-radius:8px;color:var(--texto-s);padding:6px 12px;font-size:.8rem;cursor:pointer;flex:1;}
+    .fav-btn-m.ativo{background:rgba(201,168,76,.15);border-color:var(--ouro-esc);color:var(--ouro);}
+    .tema-select-m{flex:1;background:var(--fundo-3);border:1px solid var(--borda);border-radius:8px;color:var(--texto-s);padding:6px 8px;font-size:.78rem;outline:none;}
+    .nova-tema-row{display:flex;gap:6px;margin-top:6px;}
+    .nova-tema-inp{flex:1;background:var(--fundo-3);border:1px solid var(--borda);border-radius:6px;color:var(--texto);font-size:.8rem;padding:5px 8px;outline:none;}
+    .nova-tema-btn{background:var(--fundo-3);border:1px solid var(--borda);border-radius:6px;color:var(--ouro);padding:5px 10px;font-size:.8rem;cursor:pointer;}
+    .popup-footer-m{display:flex;gap:8px;margin-top:16px;}
+    .popup-salvar-m{flex:1;background:linear-gradient(135deg,var(--ouro),#a07830);border:none;border-radius:8px;color:#1a0f00;padding:10px;font-weight:700;font-size:.85rem;cursor:pointer;}
+    .popup-cancelar-m{background:var(--fundo-3);border:1px solid var(--borda);border-radius:8px;color:var(--texto-s);padding:10px 16px;font-size:.85rem;cursor:pointer;}
+
+    .vazio{text-align:center;padding:60px 20px;color:var(--texto-f);}
+    .vazio p{font-size:.9rem;margin-top:8px;}
+    .spinner{display:inline-block;width:28px;height:28px;border:3px solid var(--borda);border-top-color:var(--ouro);border-radius:50%;animation:spin .7s linear infinite;}
+    @keyframes spin{to{transform:rotate(360deg);}}
+  </style>
+</head>
+<body>
+
+<div class="topo">
+  <a class="btn-voltar" href="./index.html">← Voltar</a>
+  <span class="topo-titulo" id="topo-titulo">Carregando...</span>
+  <button class="btn-notas-topo" onclick="abrirNotas()">📝 Notas</button>
+</div>
+
+<div class="historico-bar" id="historico-bar"></div>
+
+<div class="conteudo" id="conteudo">
+  <div style="text-align:center;padding:60px 20px"><div class="spinner"></div></div>
+</div>
+
+<!-- NOTAS GAVETA -->
+<div class="notas-overlay" id="notas-overlay" onclick="fecharNotas()"></div>
+<div class="notas-gaveta" id="notas-gaveta">
+  <div class="notas-handle">
+    <span class="notas-handle-titulo">📝 Notas &amp; Sermões</span>
+    <div class="notas-handle-btns">
+      <button class="nh-btn" onclick="notaNova()">＋ Nova</button>
+      <button class="nh-btn" onclick="notasExportar()">⬇ Salvar</button>
+      <button class="nh-btn" onclick="fecharNotas()">✕</button>
+    </div>
+  </div>
+  <div class="notas-tabs-bar" id="notas-tabs-bar"></div>
+  <div class="notas-corpo-g">
+    <input type="text" id="nota-titulo-g" class="nota-titulo-inp" placeholder="Título do sermão..."/>
+    <textarea id="nota-editor-g" class="nota-editor-g" placeholder="Escreva suas anotações aqui...
+
+Dicas:
+• Use referências como [João 3:16]
+• Organize com títulos em MAIÚSCULAS
+• Separe seções com — — —"></textarea>
+    <div class="nota-footer-g">
+      <span id="nota-palavras-g">0 palavras</span>
+      <span id="nota-status-g">—</span>
+    </div>
+  </div>
+</div>
+
+<!-- POPUP VERSÍCULO -->
+<div class="popup-overlay" id="popup-overlay">
+  <div class="popup-card-m">
+    <div class="popup-header-m">
+      <span class="popup-ref-m" id="popup-ref-m"></span>
+      <button class="popup-fechar-m" onclick="fecharPopup()">✕</button>
+    </div>
+    <p class="popup-verso-txt" id="popup-verso-txt"></p>
+    <div class="popup-secao-m">
+      <div class="popup-label-m">Destaque</div>
+      <div class="popup-cores-m">
+        <button class="cor-btn-m" data-cor="" onclick="selCor(this)">✕</button>
+        <button class="cor-btn-m" data-cor="#c9a84c40" style="background:#c9a84c40" onclick="selCor(this)"></button>
+        <button class="cor-btn-m" data-cor="#4caf7d40" style="background:#4caf7d40" onclick="selCor(this)"></button>
+        <button class="cor-btn-m" data-cor="#5b8dd940" style="background:#5b8dd940" onclick="selCor(this)"></button>
+        <button class="cor-btn-m" data-cor="#e0606040" style="background:#e0606040" onclick="selCor(this)"></button>
+        <button class="cor-btn-m" data-cor="#b06be040" style="background:#b06be040" onclick="selCor(this)"></button>
+      </div>
+    </div>
+    <div class="popup-secao-m">
+      <div class="popup-label-m">Anotação do versículo</div>
+      <textarea class="popup-textarea-m" id="popup-anotacao-m" placeholder="Sua reflexão sobre este versículo..."></textarea>
+    </div>
+    <div class="popup-secao-m">
+      <div class="popup-label-m">Marcador</div>
+      <div class="popup-marcadores-m">
+        <button class="marcador-btn-m" data-cor="" onclick="selMarcador(this)">✕</button>
+        <button class="marcador-btn-m" data-cor="#c9a84c" style="background:#c9a84c" onclick="selMarcador(this)"></button>
+        <button class="marcador-btn-m" data-cor="#4caf7d" style="background:#4caf7d" onclick="selMarcador(this)"></button>
+        <button class="marcador-btn-m" data-cor="#5b8dd9" style="background:#5b8dd9" onclick="selMarcador(this)"></button>
+        <button class="marcador-btn-m" data-cor="#e06060" style="background:#e06060" onclick="selMarcador(this)"></button>
+      </div>
+    </div>
+    <div class="popup-secao-m">
+      <div class="popup-label-m">Favorito &amp; Tema</div>
+      <div class="popup-row-m">
+        <button class="fav-btn-m" id="fav-btn-m" onclick="toggleFav()">☆ Favorito</button>
+        <select class="tema-select-m" id="tema-select-m"><option value="">+ Adicionar a tema</option></select>
+      </div>
+      <div class="nova-tema-row">
+        <input class="nova-tema-inp" id="nova-tema-inp" placeholder="Criar novo tema..."/>
+        <button class="nova-tema-btn" onclick="criarTema()">＋</button>
+      </div>
+    </div>
+    <div class="popup-footer-m">
+      <button class="popup-salvar-m" onclick="salvarPopup()">✓ Salvar</button>
+      <button class="popup-cancelar-m" onclick="fecharPopup()">Cancelar</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const STORAGE_KEY='sermao_v25', NOTAS_KEY='sermao_notas_v25';
+let BIBLIA={}, REFS={};
+let S={favoritos:{},marcadores:{},destaques:{},anotacoes:{},temas:{}};
+let NOTAS=[], notaAtiva=null, popupRef=null, popupCorSel='', popupMarcadorSel='';
+let HISTORICO=[];
+
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+
+function destacar(texto,termo,exata){
+  if(!termo) return esc(texto);
+  try{const ps=exata?[termo]:termo.trim().split(/\s+/);let r=esc(texto);for(const p of ps){const re=new RegExp(p.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'),'gi');r=r.replace(re,m=>`<mark>${m}</mark>`);}return r;}catch{return esc(texto);}
+}
+
+function capVersos(livro,cap){
+  const p=`${livro} ${cap}:`,lista=[];
+  for(const[k,v] of Object.entries(BIBLIA)) if(k.startsWith(p)) lista.push({ref:k,n:+k.split(':')[1],txt:v});
+  return lista.sort((a,b)=>a.n-b.n);
+}
+
+// PERSISTÊNCIA
+function salvarDados(){try{localStorage.setItem(STORAGE_KEY,JSON.stringify(S));}catch{}}
+function carregarDados(){
+  try{const d=JSON.parse(localStorage.getItem(STORAGE_KEY)||'{}');
+  S.favoritos=d.favoritos||{};S.marcadores=d.marcadores||{};S.destaques=d.destaques||{};S.anotacoes=d.anotacoes||{};S.temas=d.temas||{};}catch{}
+}
+
+// NOTAS
+function notasCarregar(){
+  try{NOTAS=JSON.parse(localStorage.getItem(NOTAS_KEY)||'[]');}catch{NOTAS=[];}
+  if(!NOTAS.length) notaNova(false); else{notasRenderTabs();notasAtivar(NOTAS[0].id);}
+}
+function notasSalvar(){try{localStorage.setItem(NOTAS_KEY,JSON.stringify(NOTAS));}catch{}}
+function notaNova(focar=true){
+  const id=Date.now().toString();
+  NOTAS.unshift({id,titulo:'',corpo:'',data:new Date().toLocaleDateString('pt-BR')});
+  notasSalvar();notasRenderTabs();notasAtivar(id);
+  if(focar) setTimeout(()=>document.getElementById('nota-titulo-g')?.focus(),50);
+}
+function notasAtivar(id){
+  const n=NOTAS.find(x=>x.id===id);if(!n)return;
+  notaAtiva=id;
+  const t=document.getElementById('nota-titulo-g'),e=document.getElementById('nota-editor-g');
+  if(t)t.value=n.titulo;if(e)e.value=n.corpo;
+  notasContador();notasRenderTabs();
+}
+let _nTimer=null;
+function notasAutoSalvar(){
+  clearTimeout(_nTimer);
+  _nTimer=setTimeout(()=>{
+    if(!notaAtiva)return;
+    const n=NOTAS.find(x=>x.id===notaAtiva);if(!n)return;
+    n.titulo=document.getElementById('nota-titulo-g')?.value||'';
+    n.corpo=document.getElementById('nota-editor-g')?.value||'';
+    n.data=new Date().toLocaleDateString('pt-BR');
+    notasSalvar();notasRenderTabs();
+    const st=document.getElementById('nota-status-g');
+    if(st){st.textContent='Salvo ✓';setTimeout(()=>st.textContent='—',1800);}
+  },700);
+}
+function notasExcluir(id){
+  NOTAS=NOTAS.filter(n=>n.id!==id);notasSalvar();
+  if(notaAtiva===id){notaAtiva=null;NOTAS.length?notasAtivar(NOTAS[0].id):notaNova(false);}
+  notasRenderTabs();
+}
+function notasExportar(){
+  const n=NOTAS.find(x=>x.id===notaAtiva);if(!n)return;
+  const t=n.titulo||'Nota';
+  const blob=new Blob([`${t}\n${n.data}\n${'='.repeat(50)}\n\n${n.corpo}\n\n${'='.repeat(50)}\nGerador de Sermão v2.5`],{type:'text/plain;charset=utf-8'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);
+  a.download=`${t.replace(/[^\wÀ-ú\s]/g,'').replace(/\s+/g,'-')||'nota'}.txt`;a.click();
+}
+function notasContador(){
+  const e=document.getElementById('nota-editor-g'),c=document.getElementById('nota-palavras-g');
+  if(!e||!c)return;
+  const n=e.value.trim().split(/\s+/).filter(Boolean).length;
+  c.textContent=`${n} palavra${n!==1?'s':''}`;
+}
+function notasRenderTabs(){
+  const el=document.getElementById('notas-tabs-bar');if(!el)return;
+  el.innerHTML=NOTAS.map(n=>`<div class="ntab ${n.id===notaAtiva?'ativa':''}" onclick="notasAtivar('${n.id}')"><span>${esc((n.titulo||'Sem título').substring(0,12))}</span><button class="ntab-x" onclick="event.stopPropagation();notasExcluir('${n.id}')">✕</button></div>`).join('');
+}
+function abrirNotas(){document.getElementById('notas-overlay').classList.add('aberto');document.getElementById('notas-gaveta').classList.add('aberto');}
+function fecharNotas(){document.getElementById('notas-overlay').classList.remove('aberto');document.getElementById('notas-gaveta').classList.remove('aberto');}
+
+// POPUP
+function abrirPopup(ref){
+  popupRef=ref;popupCorSel=S.destaques[ref]||'';popupMarcadorSel=S.marcadores[ref]||'';
+  document.getElementById('popup-ref-m').textContent=ref;
+  document.getElementById('popup-verso-txt').textContent=BIBLIA[ref]?`"${BIBLIA[ref]}"`:'-';
+  document.getElementById('popup-anotacao-m').value=S.anotacoes[ref]||'';
+  const fb=document.getElementById('fav-btn-m');
+  fb.textContent=S.favoritos[ref]?'★ Favorito':'☆ Favorito';
+  fb.className='fav-btn-m'+(S.favoritos[ref]?' ativo':'');
+  document.querySelectorAll('.cor-btn-m').forEach(b=>b.classList.toggle('selecionada',b.dataset.cor===popupCorSel));
+  document.querySelectorAll('.marcador-btn-m').forEach(b=>b.classList.toggle('selecionado',b.dataset.cor===popupMarcadorSel));
+  renderTemaSelect();
+  document.getElementById('popup-overlay').classList.add('aberto');
+}
+function fecharPopup(){document.getElementById('popup-overlay').classList.remove('aberto');popupRef=null;}
+function selCor(btn){popupCorSel=btn.dataset.cor;document.querySelectorAll('.cor-btn-m').forEach(b=>b.classList.remove('selecionada'));btn.classList.add('selecionada');}
+function selMarcador(btn){popupMarcadorSel=btn.dataset.cor;document.querySelectorAll('.marcador-btn-m').forEach(b=>b.classList.remove('selecionado'));btn.classList.add('selecionado');}
+function toggleFav(){
+  if(!popupRef)return;
+  S.favoritos[popupRef]=!S.favoritos[popupRef];
+  const fb=document.getElementById('fav-btn-m');
+  fb.textContent=S.favoritos[popupRef]?'★ Favorito':'☆ Favorito';
+  fb.className='fav-btn-m'+(S.favoritos[popupRef]?' ativo':'');
+}
+function renderTemaSelect(){
+  const sel=document.getElementById('tema-select-m');
+  const temas=Object.keys(S.temas);
+  const refTemas=popupRef?Object.entries(S.temas).filter(([,refs])=>refs.includes(popupRef)).map(([t])=>t):[];
+  sel.innerHTML='<option value="">+ Adicionar a tema</option>'+temas.map(t=>`<option value="${esc(t)}"${refTemas.includes(t)?' selected':''}>${esc(t)}</option>`).join('');
+}
+function criarTema(){
+  const inp=document.getElementById('nova-tema-inp');const nome=inp.value.trim();if(!nome)return;
+  if(!S.temas[nome])S.temas[nome]=[];inp.value='';salvarDados();renderTemaSelect();
+}
+function salvarPopup(){
+  if(!popupRef)return;
+  const anot=document.getElementById('popup-anotacao-m').value.trim();
+  if(popupCorSel)S.destaques[popupRef]=popupCorSel;else delete S.destaques[popupRef];
+  if(popupMarcadorSel)S.marcadores[popupRef]=popupMarcadorSel;else delete S.marcadores[popupRef];
+  if(anot)S.anotacoes[popupRef]=anot;else delete S.anotacoes[popupRef];
+  if(!S.favoritos[popupRef])delete S.favoritos[popupRef];
+  const temaSel=document.getElementById('tema-select-m').value;
+  if(temaSel&&S.temas[temaSel]&&!S.temas[temaSel].includes(popupRef))S.temas[temaSel].push(popupRef);
+  salvarDados();fecharPopup();renderConteudo();
+}
+
+// HISTÓRICO
+function adicionarHistorico(p){
+  const label=p.label||p.ref||(p.livro?`${p.livro} ${p.cap}`:p.termo?`"${p.termo}"`:'-');
+  p={...p,label};
+  const idx=HISTORICO.findIndex(h=>h.label===label);
+  if(idx!==-1)HISTORICO.splice(idx,1);
+  HISTORICO.unshift(p);
+  if(HISTORICO.length>12)HISTORICO=HISTORICO.slice(0,12);
+  try{sessionStorage.setItem('sermao_hist',JSON.stringify(HISTORICO));}catch{}
+  renderHistorico();
+}
+function renderHistorico(){
+  const bar=document.getElementById("historico-bar");if(!bar)return;
+  bar.innerHTML=HISTORICO.map((h,i)=>{const ativa=i===0?" ativa":"";return `<div class="hist-aba${ativa}" style="display:flex;align-items:center;gap:3px"><span style="cursor:pointer" onclick="navegarHist(${i})">${esc(h.label)}</span><button onclick="fecharHist(${i})" style="background:none;border:none;color:var(--texto-f);cursor:pointer;font-size:.65rem;padding:0;line-height:1">✕</button></div>`;}).join("");
+}
+function navegarHist(i){
+  const h=HISTORICO[i];if(!h)return;
+  HISTORICO.splice(i,1);HISTORICO.unshift(h);
+  try{sessionStorage.setItem("sermao_hist",JSON.stringify(HISTORICO));}catch{}
+  paginaAtual={...h};renderConteudo();renderHistorico();
+}
+function fecharHist(i){
+  HISTORICO.splice(i,1);
+  try{sessionStorage.setItem("sermao_hist",JSON.stringify(HISTORICO));}catch{}
+  if(!HISTORICO.length){renderHistorico();document.getElementById("conteudo").innerHTML="<div class=vazio><p>Nenhuma pesquisa aberta. Use ← Voltar para buscar.</p></div>";document.getElementById("topo-titulo").textContent="Sermão";return;}
+  if(i===0){paginaAtual={...HISTORICO[0]};renderConteudo();}
+  renderHistorico();
+}
+
+// NAVEGAÇÃO
+const urlParams=new URLSearchParams(location.search);
+let paginaAtual={
+  tipo:urlParams.get('tipo'),ref:urlParams.get('ref'),
+  livro:urlParams.get('livro'),cap:parseInt(urlParams.get('cap'))||1,
+  termo:urlParams.get('termo'),exata:urlParams.get('exata')==='1'
+};
+
+function abrirRef(ref){paginaAtual={tipo:'versiculo',ref,label:ref};adicionarHistorico(paginaAtual);renderConteudo();}
+function abrirCap(livro,cap){paginaAtual={tipo:'capitulo',livro,cap:+cap,label:`${livro} ${cap}`};adicionarHistorico(paginaAtual);renderConteudo();}
+
+// RENDER
+function renderConteudo(){
+  window.scrollTo(0,0);
+  const t=paginaAtual.tipo;
+  if(t==='capitulo')renderCapitulo();
+  else if(t==='versiculo')renderVersiculo();
+  else if(t==='palavra')renderPalavras();
+  else document.getElementById('conteudo').innerHTML='<div class="vazio"><p>Tipo desconhecido.</p></div>';
+}
+
+function estiloVers(ref){
+  let s='';
+  if(S.destaques[ref])s+=`background:${S.destaques[ref]};border-radius:4px;padding:2px 4px;`;
+  if(S.marcadores[ref])s+=`border-left:3px solid ${S.marcadores[ref]};padding-left:6px;`;
+  return s;
+}
+
+function renderCapitulo(){
+  const{livro,cap}=paginaAtual;
+  const versos=capVersos(livro,cap);
+  const titulo=`${livro} ${cap}`;
+  document.getElementById('topo-titulo').textContent=titulo;
+  if(!versos.length){document.getElementById('conteudo').innerHTML='<div class="vazio"><p>Capítulo não encontrado.</p></div>';return;}
+  const nav=`<div style="display:flex;gap:8px;margin-bottom:12px">${cap>1?`<button class="btn-acao" onclick="abrirCap('${livro.replace(/'/g,"\\'")}',${cap-1})">← Cap.${cap-1}</button>`:''}<button class="btn-acao" onclick="abrirCap('${livro.replace(/'/g,"\\'")}',${cap+1})">Cap.${cap+1} →</button></div>`;
+  const linhas=versos.map(v=>{
+    const sty=estiloVers(v.ref);
+    const anot=S.anotacoes[v.ref];
+    const fav=S.favoritos[v.ref];
+    const temRef=!!REFS[v.ref];
+    return `<div class="verso-item"><span class="verso-num">${v.n}</span><div class="verso-body"><div class="verso-text" style="${sty}">${esc(v.txt)}</div>${anot?`<div class="anotacao-verso">📝 ${esc(anot)}</div>`:''}<div class="verso-btns"><button class="vbtn${fav?' ativo':''}" onclick="abrirPopup('${v.ref.replace(/'/g,"\\'")}')">✎${fav?' ★':''}</button>${temRef?`<button class="vbtn" onclick="abrirRef('${v.ref.replace(/'/g,"\\'")}')">🔗 Refs</button>`:''}</div></div></div>`;
+  }).join('');
+  document.getElementById('conteudo').innerHTML=nav+`<div class="card"><div class="cap-header"><div class="cap-titulo">${esc(titulo)}</div><div class="cap-meta">${versos.length} versículos · Almeida RC</div></div><div>${linhas}</div></div>`;
+}
+
+function renderVersiculo(){
+  const{ref}=paginaAtual;
+  document.getElementById('topo-titulo').textContent=ref;
+  const dadosRef=REFS[ref],tp=BIBLIA[ref];
+  if(!dadosRef){document.getElementById('conteudo').innerHTML='<div class="vazio"><p>Referências não encontradas para '+esc(ref)+'.</p></div>';return;}
+  const lista=Array.isArray(dadosRef)?dadosRef:(dadosRef.referencias_cruzadas||[]);
+  const dest=lista.filter(r=>r.votos>=100),dem=lista.filter(r=>r.votos<100);
+  const mCap=ref.match(/^(.+?)\s+(\d+):/);
+  const fav=S.favoritos[ref],anot=S.anotacoes[ref],sty=estiloVers(ref);
+  const renderItem=(r,n)=>`<div class="ref-item" onclick="abrirRef('${r.ref.replace(/'/g,"\\'")}')"><span class="ref-num">${n}</span><div class="ref-body"><div class="ref-ref">${esc(r.ref)}</div>${r.texto?`<div class="ref-txt">"${esc(r.texto)}"</div>`:''}<div class="ref-votos ${r.votos>=100?'hi':''}">${r.votos>=100?'⭐ ':''}${r.votos} votos</div></div></div>`;
+  document.getElementById('conteudo').innerHTML=`<div class="card"><div class="verso-ref-card">✦ ${esc(ref)}</div>${tp?`<div class="verso-txt-card" style="${sty}">"${esc(tp)}"</div>`:''} ${anot?`<div style="padding:0 14px 10px"><div class="anotacao-verso">📝 ${esc(anot)}</div></div>`:''}<div class="card-acoes"><button class="btn-acao${fav?' ativo':''}" onclick="abrirPopup('${ref.replace(/'/g,"\\'")}')">✎ Anotar${fav?' ★':''}</button>${mCap?`<button class="btn-acao" onclick="abrirCap('${mCap[1].replace(/'/g,"\\'")}',${mCap[2]})">📖 Cap.${mCap[2]}</button>`:''}</div></div>${dest.length?`<div class="secao-titulo">Mais Relevantes (${dest.length})</div>${dest.map((r,i)=>renderItem(r,i+1)).join('')}`:''}${dem.length?`<div class="secao-titulo">Outras (${dem.length})</div>${dem.map((r,i)=>renderItem(r,dest.length+i+1)).join('')}`:''}`;
+}
+
+function renderPalavras(){
+  const{termo,exata}=paginaAtual;
+  document.getElementById('topo-titulo').textContent=`"${termo}"`;
+  const tl=termo.trim().toLowerCase(),res=[];
+  for(const[r,texto] of Object.entries(BIBLIA)){
+    const ok=exata?texto.toLowerCase().includes(tl):tl.split(/\s+/).every(p=>texto.toLowerCase().includes(p));
+    if(ok)res.push({ref:r,texto});if(res.length>=500)break;
+  }
+  if(!res.length){document.getElementById('conteudo').innerHTML='<div class="vazio"><p>Nenhum resultado.</p></div>';return;}
+  const itens=res.map(({ref:r,texto})=>`<div class="palavra-item" onclick="abrirRef('${r.replace(/'/g,"\\'")}')"><div class="palavra-ref-txt">${esc(r)}</div><div class="palavra-trecho">${destacar(texto,termo,exata)}</div></div>`).join('');
+  document.getElementById('conteudo').innerHTML=`<div class="secao-titulo">${res.length}${res.length===500?'+':''} versículos encontrados</div>${itens}`;
+}
+
+// INIT
+carregarDados();
+notasCarregar();
+try{HISTORICO=JSON.parse(sessionStorage.getItem('sermao_hist')||'[]');}catch{HISTORICO=[];}
+
+document.getElementById('nota-titulo-g').addEventListener('input',notasAutoSalvar);
+document.getElementById('nota-editor-g').addEventListener('input',()=>{notasContador();notasAutoSalvar();});
+
+fetch('./data/referencias.json')
+  .then(r=>r.json())
+  .then(dados=>{
+    BIBLIA=dados.biblia||{};REFS=dados.referencias||{};
+    const label=paginaAtual.ref||(paginaAtual.livro?`${paginaAtual.livro} ${paginaAtual.cap}`:paginaAtual.termo?`"${paginaAtual.termo}"`:'-');
+    adicionarHistorico({...paginaAtual,label});
+    renderConteudo();
+  })
+  .catch(()=>{document.getElementById('conteudo').innerHTML='<div class="vazio"><p>Erro ao carregar dados.</p></div>';});
+</script>
+</body>
+</html>

@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Teste Scroll 3</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { height: 100%; overflow: hidden; background: #0c1016; color: #dde4ee; font-family: sans-serif; }
+
+    .app-root { display: flex; flex-direction: column; height: 100dvh; overflow: hidden; }
+    .sidebar { background: #131921; border-bottom: 1px solid #253347; padding: 10px; flex-shrink: 0; }
+    .main-area { flex: 1; min-height: 0; display: flex; flex-direction: column; overflow: hidden; }
+    .abas-bar { background: #131921; border-bottom: 1px solid #253347; padding: 8px; flex-shrink: 0; }
+
+    /* Desktop original */
+    .abas-content { flex: 1; overflow: hidden; position: relative; }
+    .painel-aba { display: none; height: 100%; overflow-y: auto; padding: 20px; }
+    .painel-aba.ativo { display: block; }
+
+    .item { background: #1a2332; border: 1px solid #253347; border-radius: 8px; padding: 16px; margin-bottom: 10px; }
+    h3 { color: #c9a84c; margin-bottom: 6px; }
+
+    /* Mobile */
+    @media (max-width: 768px) {
+      .abas-content {
+        flex: 1 !important;
+        min-height: 0 !important;
+        overflow-y: auto !important;
+        overflow-x: hidden !important;
+        -webkit-overflow-scrolling: touch !important;
+        position: static !important;
+        height: auto !important;
+      }
+      .painel-aba {
+        display: none !important;
+        height: auto !important;
+        overflow: visible !important;
+        overflow-y: visible !important;
+        position: static !important;
+        padding: 12px 10px 100px !important;
+      }
+      .painel-aba.ativo { display: block !important; }
+    }
+  </style>
+</head>
+<body>
+<div class="app-root">
+  <div class="sidebar">
+    <p style="color:#c9a84c">✝ Teste Scroll 3</p>
+  </div>
+  <div class="main-area">
+    <div class="abas-bar">
+      <span style="font-size:.8rem;color:#8fa3bc">📖 João 3</span>
+    </div>
+    <div class="abas-content" id="abas-content">
+      <div class="painel-aba ativo" id="painel-1">
+        <div class="item"><h3>Versículo 1</h3><p>No princípio criou Deus os céus e a terra.</p></div>
+        <div class="item"><h3>Versículo 2</h3><p>E a terra era sem forma e vazia.</p></div>
+        <div class="item"><h3>Versículo 3</h3><p>E disse Deus: Haja luz; e houve luz.</p></div>
+        <div class="item"><h3>Versículo 4</h3><p>E viu Deus que a luz era boa.</p></div>
+        <div class="item"><h3>Versículo 5</h3><p>E Deus chamou à luz Dia.</p></div>
+        <div class="item"><h3>Versículo 6</h3><p>E disse Deus: Haja uma expansão no meio das águas.</p></div>
+        <div class="item"><h3>Versículo 7</h3><p>E fez Deus a expansão.</p></div>
+        <div class="item"><h3>Versículo 8</h3><p>E chamou Deus à expansão Céus.</p></div>
+        <div class="item"><h3>Versículo 9</h3><p>E disse Deus: Ajuntem-se as águas debaixo dos céus.</p></div>
+        <div class="item"><h3>Versículo 10</h3><p>E chamou Deus ao seco Terra.</p></div>
+        <div class="item"><h3>Versículo 11</h3><p>E disse Deus: Produza a terra erva.</p></div>
+        <div class="item"><h3>Versículo 12</h3><p>E a terra produziu erva.</p></div>
+        <div class="item"><h3>Versículo 13</h3><p>E foi a tarde e a manhã, o dia terceiro.</p></div>
+        <div class="item"><h3>Versículo 14</h3><p>E disse Deus: Haja luminares na expansão dos céus.</p></div>
+        <div class="item"><h3>Versículo 15</h3><p>E sejam para luminares na expansão dos céus.</p></div>
+        <div class="item"><h3>Versículo 16</h3><p>E fez Deus os dois grandes luminares.</p></div>
+        <div class="item"><h3>Versículo 17</h3><p>E os pôs Deus na expansão dos céus.</p></div>
+        <div class="item"><h3>Versículo 18</h3><p>E para governar o dia e a noite.</p></div>
+        <div class="item"><h3>Versículo 19</h3><p>E foi a tarde e a manhã, o dia quarto.</p></div>
+        <div class="item"><h3>Versículo 20</h3><p>E disse Deus: Produzam as águas répteis.</p></div>
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,24 @@
+{
+  "name": "sermon-generator",
+  "version": "1.0.0",
+  "description": "Ferramenta de estudo bíblico com referências cruzadas, desenvolvida para ajudar na preparação de sermões e no estudo profundo da Bíblia.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/binhoccbs98-svg/gerador-sermao.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/binhoccbs98-svg/gerador-sermao/issues"
+  },
+  "homepage": "https://github.com/binhoccbs98-svg/gerador-sermao#readme",
+  "dependencies": {
+    "express": "^5.2.1"
+  }
+}

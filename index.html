@@ -10,8 +10,7 @@
   <link rel="stylesheet" href="css/estilos.css"/>
 </head>
 <body>
-<div class="app-root" id="app-root">
-
+<div class="app-root" id="app-root" style="overflow:visible;">
   <!-- ═══════════ SIDEBAR ═══════════ -->
   <aside class="sidebar" id="sidebar">
 
@@ -20,13 +19,11 @@
       <div><h1 class="brand-titulo">Sermão</h1><p class="brand-sub">v2.5 · Estudo Bíblico</p></div>
     </div>
 
-    <!-- Abas de modo de busca -->
     <div class="modo-tabs">
       <button class="modo-tab active" data-modo="referencia">📖 Ref.</button>
       <button class="modo-tab" data-modo="palavra">🔍 Palavras</button>
     </div>
 
-    <!-- Busca por referência -->
     <div id="busca-ref-area" class="sidebar-busca">
       <label class="busca-label">Referência ou Capítulo</label>
       <div class="busca-grupo">
@@ -38,7 +35,6 @@
       <p class="busca-dica"><kbd>Enter</kbd> busca · aceita abreviações</p>
     </div>
 
-    <!-- Busca por palavra -->
     <div id="busca-palavra-area" class="sidebar-busca hidden">
       <label class="busca-label">Palavra ou frase</label>
       <div class="busca-grupo">
@@ -62,7 +58,6 @@
       <p class="busca-dica"><kbd>Enter</kbd> para buscar</p>
     </div>
 
-    <!-- Sugestões -->
     <div class="sidebar-section" id="secao-sugestoes">
       <p class="section-label">Sugestões</p>
       <div class="sugestoes-lista">
@@ -77,7 +72,6 @@
       </div>
     </div>
 
-    <!-- Nav de views especiais -->
     <nav class="sidebar-nav">
       <button class="nav-btn" data-view="favoritos">⭐ Favoritos</button>
       <button class="nav-btn" data-view="marcadores">🔖 Marcadores</button>
@@ -90,7 +84,6 @@
   <!-- ═══════════ ÁREA CENTRAL ═══════════ -->
   <main class="main-area">
 
-    <!-- Barra de abas -->
     <div class="abas-bar">
       <div class="abas-lista" id="abas-lista"></div>
       <div class="abas-vazia hidden" id="abas-vazia">
@@ -98,7 +91,6 @@
       </div>
     </div>
 
-    <!-- Conteúdo das abas -->
     <div class="abas-content" id="abas-content">
       <div id="boas-vindas" class="boas-vindas">
         <div class="bv-icone">✝</div>
@@ -117,12 +109,11 @@
 
   </main>
 
-  <!-- ═══════════ DIVISOR REDIMENSIONÁVEL ═══════════ -->
+  <!-- ═══════════ DIVISOR ═══════════ -->
   <div class="notas-divisor" id="notas-divisor" title="Arraste para redimensionar"></div>
 
   <!-- ═══════════ PAINEL DE NOTAS ═══════════ -->
   <aside class="notas-painel" id="notas-painel">
-
     <div class="notas-header">
       <div class="notas-header-topo">
         <span class="notas-titulo-lbl">
@@ -135,14 +126,11 @@
           <button class="nic-btn" id="btn-toggle-notas" title="Minimizar">◀</button>
         </div>
       </div>
-      <!-- Mini abas de notas -->
       <div class="notas-tabs" id="notas-tabs"></div>
     </div>
-
     <div class="notas-corpo" id="notas-corpo">
       <input type="text" id="nota-titulo" class="nota-titulo-inp" placeholder="Título do sermão..."/>
-      <textarea id="nota-editor" class="nota-editor"
-        placeholder="Escreva suas anotações aqui...
+      <textarea id="nota-editor" class="nota-editor" placeholder="Escreva suas anotações aqui...
 
 Dicas:
 • Use referências como [João 3:16]
@@ -153,16 +141,14 @@ Dicas:
         <span id="nota-status">—</span>
       </div>
     </div>
-
   </aside>
 
-  <!-- Botão flutuante para reabrir notas -->
   <button class="notas-reabrir hidden" id="btn-reabrir-notas" title="Abrir notas">
     <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14,2 14,8 20,8"/></svg>
     Notas
   </button>
 
-  <!-- ═══════════ POPUP DE ANOTAÇÃO DE VERSÍCULO ═══════════ -->
+  <!-- ═══════════ POPUP ═══════════ -->
   <div class="popup-overlay hidden" id="popup-overlay">
     <div class="popup-card" id="popup-card">
       <div class="popup-header">
@@ -170,8 +156,6 @@ Dicas:
         <button class="popup-fechar" id="popup-fechar">✕</button>
       </div>
       <p class="popup-texto-verso" id="popup-texto-verso"></p>
-
-      <!-- Destaque com cor -->
       <div class="popup-secao">
         <label class="popup-label">Destaque</label>
         <div class="popup-cores" id="popup-cores">
@@ -185,14 +169,10 @@ Dicas:
         </div>
         <input type="color" id="cor-picker" class="hidden" value="#c9a84c"/>
       </div>
-
-      <!-- Anotação do versículo -->
       <div class="popup-secao">
         <label class="popup-label">Anotação</label>
         <textarea id="popup-anotacao" class="popup-textarea" placeholder="Sua reflexão sobre este versículo..."></textarea>
       </div>
-
-      <!-- Marcador -->
       <div class="popup-secao popup-row">
         <label class="popup-label">Marcador</label>
         <div class="popup-marcador-cor" id="popup-marcador-cor">
@@ -203,15 +183,12 @@ Dicas:
           <button class="cor-btn cor-marcador" data-cor="#e06060" style="background:#e06060" title="Vermelho"></button>
         </div>
       </div>
-
-      <!-- Favorito + Tema -->
       <div class="popup-secao popup-row">
         <button class="popup-fav-btn" id="popup-fav-btn">☆ Favorito</button>
         <select id="popup-tema-sel" class="popup-tema-sel">
           <option value="">+ Adicionar a tema</option>
         </select>
       </div>
-
       <div class="popup-footer">
         <button class="popup-salvar" id="popup-salvar">Salvar</button>
         <button class="popup-cancelar" id="popup-cancelar">Cancelar</button>
@@ -222,5 +199,29 @@ Dicas:
 </div><!-- /app-root -->
 
 <script src="js/app.js"></script>
+<script>
+if(window.innerWidth <= 768){
+  document.addEventListener('DOMContentLoaded', function(){
+    function fixScroll(){
+      var ac = document.getElementById('abas-content');
+      if(!ac) return;
+      // Remove height fixo e força overflow-y scroll
+      ac.style.height = '';
+      ac.style.maxHeight = '';
+      ac.style.minHeight = '0';
+      ac.style.overflowY = 'scroll';
+      ac.style.overflowX = 'hidden';
+      ac.style.webkitOverflowScrolling = 'touch';
+      ac.style.flex = '1';
+    }
+    fixScroll();
+    setTimeout(fixScroll, 200);
+    setTimeout(fixScroll, 800);
+
+    // Reaplicar sempre que nova aba abrir
+    document.getElementById('abas-content').addEventListener('DOMSubtreeModified', fixScroll);
+  });
+}
+</script>
 </body>
 </html>
